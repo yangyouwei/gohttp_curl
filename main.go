@@ -11,7 +11,7 @@ import (
 var waitgroup sync.WaitGroup
 
 func main()  {
-	waitgroup.Add(1)
+	waitgroup.Add(1)  //因为是1下面没有done，所以main会一直等待go程运行完毕。
 
 	Address := flag.String("u","","-u http://baidu.com 访问url")
 	Concurrent := flag.Int("c",5,"-c 5 设置并发数，单位时间内的goroutines数量")
@@ -34,7 +34,7 @@ func main()  {
 		}
 	}()
 
-	for i := 1;i < concurrent ;i ++  {
+	for i := 1;i < concurrent ;i ++  {//没有waitgroup的话，运行完for循环，主程序就退出了。goroutines也就结束了，看不到结果。
 		go func (){
 			for {
 				address := <- c
@@ -71,3 +71,22 @@ func httpget(url *string ,c *http.Client) int {
 	return resp.StatusCode
 }
 
+// func do_somethine1(wg *sync.WaitGroup)  {
+// 	wg.Done()
+// 	fmt.Println("do_somethine1")
+// }
+// func do_somethine2(wg *sync.WaitGroup)  {
+// 	wg.Done()
+// 	fmt.Println("do_somethine1")
+// }
+// func do()  {
+// 	wg := sync.WaitGroup{}
+// 	wg.Add(2)
+// 	go do_somethine1(&wg)
+// 	go do_somethine2(&wg)
+// 	wg.Wait()
+// }
+//几个goroutines 就add多少
+//wait会等待goroutines完成后退出
+//wg=0时就不等待了。
+//每个goroutines运行后都会done -1
